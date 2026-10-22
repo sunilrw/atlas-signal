@@ -8,6 +8,18 @@ filter the feed, and follow locations without creating an account.
 
 Made by Sunil Warrier. Visit the live app at [as.uti1.com](https://as.uti1.com).
 
+## License
+
+The original Atlas Signal source code and project documentation are licensed
+under the [MIT License](LICENSE). You may use, modify, and redistribute them,
+including in commercial projects, provided you retain the copyright and license
+notice.
+
+Third-party software, fonts, map data, publisher content, and other assets keep
+their own copyright and license terms. See `public/data/ATTRIBUTION.md` and the
+license files beside those assets. Publisher material visible in the screenshots
+remains the property of its respective publishers.
+
 ## Screenshots
 
 Captured from the live application on 22 October 2026.
