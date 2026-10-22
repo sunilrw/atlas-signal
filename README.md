@@ -8,6 +8,11 @@ filter the feed, and follow locations without creating an account.
 
 Made by Sunil Warrier. Visit the live app at [as.uti1.com](https://as.uti1.com).
 
+## Contributors
+
+- Sunil Warrier — creator and project maintainer
+- OpenAI Codex — AI-assisted development and documentation
+
 ## License
 
 The original Atlas Signal source code and project documentation are licensed
