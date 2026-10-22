@@ -1,0 +1,104 @@
+name: atlas-signal
+
+services:
+  app:
+    build:
+      context: .
+      target: runner
+    init: true
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${PORT:-3000}:3000"
+    environment:
+      DATABASE_URL: ${DOCKER_DATABASE_URL:-}
+      RELIEFWEB_APPNAME: ${RELIEFWEB_APPNAME:-}
+      USGS_ENABLED: ${USGS_ENABLED:-true}
+      GDACS_ENABLED: ${GDACS_ENABLED:-true}
+      GDELT_ENABLED: ${GDELT_ENABLED:-false}
+      RSS_ENABLED: ${RSS_ENABLED:-true}
+      BBC_ENABLED: ${BBC_ENABLED:-true}
+      DW_ENABLED: ${DW_ENABLED:-true}
+      UN_NEWS_ENABLED: ${UN_NEWS_ENABLED:-true}
+      GLOBAL_VOICES_ENABLED: ${GLOBAL_VOICES_ENABLED:-true}
+      FRANCE24_ENABLED: ${FRANCE24_ENABLED:-false}
+      ALJAZEERA_ENABLED: ${ALJAZEERA_ENABLED:-false}
+    stop_grace_period: 20s
+
+  db:
+    image: postgis/postgis:17-3.5
+    platform: linux/amd64
+    profiles: ["database", "worker"]
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: atlas
+      POSTGRES_DB: atlas_signal
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-atlas-local-only}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U atlas -d atlas_signal"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    stop_grace_period: 30s
+
+  migrate:
+    build:
+      context: .
+      target: tools
+    profiles: ["database"]
+    command: ["npm", "run", "db:migrate"]
+    environment:
+      DATABASE_URL: ${DOCKER_DATABASE_URL:-postgresql://atlas:atlas-local-only@db:5432/atlas_signal}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  worker:
+    build:
+      context: .
+      target: tools
+    profiles: ["worker"]
+    init: true
+    command: ["npm", "run", "ingest"]
+    environment:
+      DATABASE_URL: ${DOCKER_DATABASE_URL:-postgresql://atlas:atlas-local-only@db:5432/atlas_signal}
+      RELIEFWEB_APPNAME: ${RELIEFWEB_APPNAME:-}
+      USGS_ENABLED: ${USGS_ENABLED:-true}
+      GDACS_ENABLED: ${GDACS_ENABLED:-true}
+      GDELT_ENABLED: ${GDELT_ENABLED:-false}
+      RSS_ENABLED: ${RSS_ENABLED:-true}
+      BBC_ENABLED: ${BBC_ENABLED:-true}
+      DW_ENABLED: ${DW_ENABLED:-true}
+      UN_NEWS_ENABLED: ${UN_NEWS_ENABLED:-true}
+      GLOBAL_VOICES_ENABLED: ${GLOBAL_VOICES_ENABLED:-true}
+      FRANCE24_ENABLED: ${FRANCE24_ENABLED:-false}
+      ALJAZEERA_ENABLED: ${ALJAZEERA_ENABLED:-false}
+      INGEST_INTERVAL_SECONDS: ${INGEST_INTERVAL_SECONDS:-300}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    stop_grace_period: 20s
+
+  # Infrastructure placeholder only. The application does not currently read
+  # REDIS_URL or use Redis/BullMQ. This profile is not needed for any MVP feature.
+  redis:
+    image: redis:7-alpine
+    profiles: ["cache"]
+    command: ["redis-server", "--appendonly", "yes"]
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  postgres_data:
+  redis_data:

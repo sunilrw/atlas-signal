@@ -1,0 +1,46 @@
+{
+  "name": "atlas-signal",
+  "version": "0.1.0",
+  "private": true,
+  "engines": { "node": ">=22.19.0" },
+  "description": "A calm, map-first global intelligence workspace.",
+  "scripts": {
+    "predev": "node scripts/sync-map-assets.mjs",
+    "dev": "next dev",
+    "prebuild": "node scripts/sync-map-assets.mjs",
+    "build": "next build",
+    "postbuild": "node scripts/prepare-standalone.mjs",
+    "start": "node .next/standalone/server.js",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "ingest": "tsx scripts/ingest.ts",
+    "db:migrate": "tsx scripts/db-migrate.ts",
+    "verify:live": "node scripts/verify-live.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "fast-xml-parser": "^5.3.6",
+    "lucide-react": "^0.577.0",
+    "maplibre-gl": "^6.9.0",
+    "next": "16.3.5",
+    "pg": "^8.16.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "undici": "^8.10.2",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/geojson": "^7946.0.16",
+    "@types/node": "^24.10.0",
+    "@types/pg": "^8.16.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.0",
+    "eslint-config-next": "16.3.5",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}

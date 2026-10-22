@@ -1,0 +1,16 @@
+node_modules
+.next
+.git
+.env
+.env.*
+!.env.example
+coverage
+playwright-report
+test-results
+*.log
+.DS_Store
+.openai
+output
+dist
+.codex
+tsconfig.tsbuildinfo
